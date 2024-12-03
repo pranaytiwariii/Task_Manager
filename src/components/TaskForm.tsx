@@ -1,6 +1,6 @@
 import React from 'react';
 import { Form, Input, DatePicker, Select, Button } from 'antd';
-import { Task, Priority } from '../types/task';
+import { Task } from '../types/task';
 
 interface TaskFormProps {
   initialValues?: Partial<Task>;

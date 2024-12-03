@@ -25,7 +25,6 @@ export const TaskList: React.FC<TaskListProps> = ({
   onTaskSelect,
   onTaskEdit,
   onTaskDelete,
-  onTaskStatusToggle,
 }) => {
   return (
     <List

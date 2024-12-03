@@ -1,67 +1,49 @@
 import React, { useState } from 'react';
-import { Layout, Modal, message } from 'antd';
-import { TaskForm } from './task/TaskForm';
-import { TaskList } from './task/TaskList';
-import { TaskFilters } from './filters/TaskFilters';
-import { Header } from './layout/Header';
+import { Layout, message, Modal } from 'antd';
+import { Task } from '../types/task';
 import { useTaskOperations } from '../hooks/useTaskOperations';
 import { useTaskFilters } from '../hooks/useTaskFilters';
-import { Task } from '../types/task';
-import { useSelector } from 'react-redux';
-import { RootState } from '../store/store';
+import { TaskForm } from './TaskForm';
+import { TaskList } from './TaskList';
 
-const { Content, Sider } = Layout;
+const { Header, Content, Sider } = Layout;
 
 export const TaskDashboard: React.FC = () => {
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  
+  const [selectedTasks, setSelectedTasks] = useState<string[]>([]);
   const { createTask, editTask, removeTask, toggleTaskStatus } = useTaskOperations();
-  const { filter, updateFilter, getFilteredTasks } = useTaskFilters();
-  const selectedTasks = useSelector((state: RootState) => state.tasks.selectedTasks);
+  const { getFilteredTasks } = useTaskFilters();
 
-  const handleTaskSubmit = (values: Partial<Task>) => {
+  const toggleTaskSelection = (taskId: string): void => {
+    setSelectedTasks((prevSelectedTasks) =>
+      prevSelectedTasks.includes(taskId)
+        ? prevSelectedTasks.filter((id) => id !== taskId)
+        : [...prevSelectedTasks, taskId]
+    );
+  };
+
+  const handleTaskSubmit = (values: any) => {
     if (editingTask) {
-      editTask({ ...editingTask, ...values });
+      if (editingTask) {
+        if (editingTask) {
+          if (editingTask) {
+            if (editingTask) {
+              editTask({ ...editingTask, ...values });
+            }
+          }
+        }
+      }
       message.success('Task updated successfully');
     } else {
-      createTask(
-        values.title!,
-        values.description,
-        values.dueDate,
-        values.priority,
-      );
+      createTask(values);
       message.success('Task created successfully');
     }
     setIsModalVisible(false);
     setEditingTask(null);
   };
 
-  const handleTaskEdit = (task: Task) => {
-    setEditingTask(task);
-    setIsModalVisible(true);
-  };
-
-  const handleTaskDelete = (taskId: string) => {
-    Modal.confirm({
-      title: 'Delete Task',
-      content: 'Are you sure you want to delete this task?',
-      okText: 'Yes',
-      okType: 'danger',
-      cancelText: 'No',
-      onOk() {
-        removeTask([taskId]);
-        message.success('Task deleted successfully');
-      },
-    });
-  };
-
-  const handleBatchDelete = () => {
-    if (selectedTasks.length === 0) {
-      message.warning('Please select tasks to delete');
-      return;
-    }
-
+  const handleDeleteSelectedTasks = () => {
     Modal.confirm({
       title: 'Delete Selected Tasks',
       content: `Are you sure you want to delete ${selectedTasks.length} selected tasks?`,
@@ -77,33 +59,36 @@ export const TaskDashboard: React.FC = () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Header
-        selectedCount={selectedTasks.length}
-        onAddTask={() => setIsModalVisible(true)}
-        onBatchDelete={handleBatchDelete}
-      />
+      <Header>
+        {/* Add your header content here */}
+      </Header>
       <Layout>
-        <Sider width={300} theme="light" style={{ padding: '24px' }}>
-          <TaskFilters
-            filter={filter}
-            onFilterChange={updateFilter}
-          />
+        <Sider>
+          {/* Add your sider content here */}
         </Sider>
-        <Content style={{ padding: '24px' }}>
+        <Content>
           <TaskList
             tasks={getFilteredTasks()}
             selectedTasks={selectedTasks}
             onTaskSelect={toggleTaskSelection}
-            onTaskEdit={handleTaskEdit}
-            onTaskDelete={handleTaskDelete}
             onTaskStatusToggle={toggleTaskStatus}
+            onTaskEdit={(task) => {
+              setEditingTask(task);
+              setIsModalVisible(true);
+            }}
+            onTaskDelete={(taskId) => {
+              removeTask([taskId]);
+              message.success('Task deleted successfully');
+            }}
           />
+          <button onClick={() => setIsModalVisible(true)}>Add Task</button>
+          <button onClick={handleDeleteSelectedTasks} disabled={selectedTasks.length === 0}>
+            Delete Selected Tasks
+          </button>
         </Content>
       </Layout>
-
       <Modal
-        title={editingTask ? 'Edit Task' : 'Create Task'}
-        open={isModalVisible}
+        visible={isModalVisible}
         onCancel={() => {
           setIsModalVisible(false);
           setEditingTask(null);
@@ -122,3 +107,5 @@ export const TaskDashboard: React.FC = () => {
     </Layout>
   );
 };
+
+export default TaskDashboard;
